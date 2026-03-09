@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Notes ✦</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f5f0fb;
+      --surface:     #ffffff;
+      --border:      #ddd0f0;
+      --accent:      #a855f7;
+      --accent2:     #9333ea;
+      --accent-soft: #ede4f7;
+      --text:        #3b2459;
+      --muted:       #a990c4;
+      --danger:      #e879a0;
+      --shadow:      rgba(168, 85, 247, 0.12);
+    }
+
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 15% 10%, #e9d5ff55 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 80%, #fce7f355 0%, transparent 55%);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1rem 4rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -80px; right: -80px;
+      width: 320px; height: 320px;
+      background: radial-gradient(circle, #d8b4fe44, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -60px; left: -60px;
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, #fbcfe844, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    header {
+      width: 100%;
+      max-width: 660px;
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 0.75rem;
+    }
+
+    header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.6rem;
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.15;
+    }
+
+    header h1 em { font-style: italic; color: var(--accent); }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+    }
+
+    .compose {
+      width: 100%;
+      max-width: 660px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 1.4rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 24px var(--shadow);
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .compose:focus-within {
+      box-shadow: 0 6px 32px rgba(168, 85, 247, 0.2);
+      border-color: #c4b5fd;
+    }
+
+    .compose-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    textarea {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      resize: none;
+      min-height: 90px;
+      line-height: 1.75;
+    }
+
+    textarea::placeholder { color: #c4b0d8; }
+
+    .compose-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1.5px dashed var(--border);
+      padding-top: 0.75rem;
+    }
+
+    #char-count { font-size: 0.72rem; color: var(--muted); }
+
+    button.submit {
+      background: linear-gradient(135deg, var(--accent), #c084fc);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0.5rem 1.4rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    button.submit:hover  { opacity: 0.88; }
+    button.submit:active { transform: scale(0.96); }
+
+    #error-msg { font-size: 0.78rem; color: var(--danger); display: none; }
+
+    .notes-header {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .notes-header h2 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    #notes-count {
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+
+    #notes-list { width: 100%; max-width: 660px; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .note-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.25rem 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      box-shadow: 0 2px 12px var(--shadow);
+      animation: popIn 0.22s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .note-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, #a855f7, #f9a8d4);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.96) translateY(6px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .note-body { flex: 1; }
+
+    .note-content {
+      font-size: 0.92rem;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--text);
+    }
+
+    .note-ts {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 0.45rem;
+    }
+
+    button.delete {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 600;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+
+    button.delete:hover { border-color: var(--danger); color: var(--danger); background: #fdf2f8; }
+
+    #empty-state {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      display: none;
+    }
+
+    #empty-state span { display: block; font-size: 2rem; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-badge">✦ my notes</div>
+    <h1>Write it down,<br><em>save it forever</em></h1>
+    <p>Every entry goes straight into the database ✨</p>
+  </header>
+
+  <div class="compose">
+    <div class="compose-label">New entry</div>
+    <textarea id="note-input" placeholder="What's on your mind?" maxlength="2000"></textarea>
+    <div class="compose-footer">
+      <span id="char-count">0 / 2000</span>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <span id="error-msg">Can't be empty 💜</span>
+        <button class="submit" onclick="submitNote()">Save ✦</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes-header">
+    <h2>Saved entries</h2>
+    <span id="notes-count">0</span>
+  </div>
+
+  <div id="notes-list"></div>
+  <div id="empty-state">
+    <span>🌸</span>
+    Nothing here yet — write your first note!
+  </div>
+
+  <script>
+    const input    = document.getElementById("note-input");
+    const counter  = document.getElementById("char-count");
+    const errorMsg = document.getElementById("error-msg");
+    const list     = document.getElementById("notes-list");
+    const empty    = document.getElementById("empty-state");
+    const count    = document.getElementById("notes-count");
+
+    input.addEventListener("input", () => {
+      counter.textContent = `${input.value.length} / 2000`;
+      errorMsg.style.display = "none";
+    });
+
+    async function loadNotes() {
+      const res   = await fetch("/api/notes");
+      const notes = await res.json();
+      list.innerHTML = "";
+      count.textContent = notes.length;
+      if (notes.length === 0) { empty.style.display = "block"; return; }
+      empty.style.display = "none";
+      notes.forEach(n => list.appendChild(makeCard(n)));
+    }
+
+    function makeCard(note) {
+      const card = document.createElement("div");
+      card.className = "note-card";
+      card.id = `note-${note.id}`;
+      card.innerHTML = `
+        <div class="note-body">
+          <div class="note-content">${escHtml(note.content)}</div>
+          <div class="note-ts">${note.created_at} UTC</div>
+        </div>
+        <button class="delete" onclick="deleteNote(${note.id})">✕ delete</button>
+      `;
+      return card;
+    }
+
+    async function submitNote() {
+      const content = input.value.trim();
+      if (!content) { errorMsg.style.display = "inline"; return; }
+      const res = await fetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content })
+      });
+      if (res.ok) {
+        input.value = "";
+        counter.textContent = "0 / 2000";
+        await loadNotes();
+      }
+    }
+
+    async function deleteNote(id) {
+      await fetch(`/api/notes/${id}`, { method: "DELETE" });
+      await loadNotes();
+    }
+
+    function escHtml(str) {
+      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) submitNote();
+    });
+
+    loadNotes();
+  </script>
+</body>
+</html>
