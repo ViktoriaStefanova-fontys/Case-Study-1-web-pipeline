@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 
@@ -82,6 +83,8 @@ def delete_note(note_id):
 # ── Init ─────────────────────────────────────────────────────────────────────
 with app.app_context():
     db.create_all()
+
+metrics = PrometheusMetrics(app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
