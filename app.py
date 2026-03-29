@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from prometheus_flask_exporter import PrometheusMetrics
 
+
 app = Flask(__name__)
 
 # ── Database config ──────────────────────────────────────────────────────────
